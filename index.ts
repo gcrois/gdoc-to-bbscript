@@ -137,7 +137,7 @@ function downloadImages() {
 function downloadMarkdownAndImages() {
     const doc = DocumentApp.getActiveDocument();
     const content = extractMarkdown(doc);
-    const markdownBlob = Utilities.newBlob(content, 'text/markdown', 'document.md');
+    const markdownBlob = Utilities.newBlob(content, 'text/markdown', doc.getName().replace(/[\W_]+/g, "_") + ".md");
     const imageBlobs = extractImages(doc);
     const allBlobs = [markdownBlob, ...imageBlobs];
     const filename = getFileName("markdown_and_images") + ".zip";
@@ -155,7 +155,7 @@ function downloadHtmlWithImages() {
     let htmlContent = marked.parse(markdownContent);
 
     const imageBlobs = extractImages(doc);
-    const htmlBlob = Utilities.newBlob(htmlContent, 'text/html', 'document.html');
+    const htmlBlob = Utilities.newBlob(htmlContent, 'text/html', doc.getName().replace(/[\W_]+/g, "_") + ".html");
     const allBlobs = [htmlBlob, ...imageBlobs];
 
     // Download the ZIP containing both the HTML and images
