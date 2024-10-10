@@ -1,6 +1,6 @@
 function onOpen() {
     const ui = DocumentApp.getUi();
-    ui.createMenu('Doc To BBCode')
+    ui.createMenu('DocConverter')
         .addItem('Download Markdown', 'downloadMarkdown')
         .addItem('Download Images', 'downloadImages')
         .addItem('Download Markdown and Images', 'downloadMarkdownAndImages')
@@ -27,18 +27,27 @@ function extractMarkdown(doc: GoogleAppsScript.Document.Document = DocumentApp.g
 
     let content = response.getBlob().getDataAsString();
 
+    Logger.log(content);
+
     // Replace image placeholders with filenames
     const body = doc.getBody();
     const images = body.getImages();
     images.forEach((image, i) => {
         const imageName = `image${i + 1}`;
-        const filename = `${imageName}.${image.getBlob().getContentType()!.split('/').pop()}`;
-        const referenceRegex = new RegExp(`!\[.*?\]\[${imageName}\]`, 'g');
+        const filename = `./${imageName}.${image.getBlob().getContentType()!.split('/').pop()}`;
+        Logger.log(`Replacing ${imageName} with ${filename}`);
+        Logger.log(`regex: ${'!\\[.*?\\]\\[' + imageName + '\\]'}`);
+        const referenceRegex = new RegExp(`!\\[.*?\\]\\[${imageName}\\]`, 'g');
         content = content.replace(referenceRegex, `![](${filename})`);
     });
 
     // Remove all image definitions
-    content = content.replace(/!\[.*?\]: .*?$/gm, '');
+    Logger.log('Removing image definitions');
+    Logger.log(`regex: ${'\\[.*?\\]: .*'}`);
+    const imageDefinitionRegex = new RegExp(`\\[.*?\\]: .*`, 'g');
+    content = content.replace(imageDefinitionRegex, '');
+
+    Logger.log(content);
     return content;
 }
 
